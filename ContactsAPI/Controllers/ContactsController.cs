@@ -20,6 +20,17 @@ namespace ContactsAPI.Controllers
         {
             return Ok(dbContext.Contacts.ToList());   
         }
+        [HttpGet]
+        [Route("{id:guid}")]
+        public IActionResult GetContact([FromRoute] Guid id)
+        {
+            var contact = dbContext.Contacts.Find(id);
+            if (contact != null)
+            {
+                return Ok(contact);
+            }
+            return NotFound();
+        }
 
         [HttpPost]
         public IActionResult AddContact(AddContactRequest addContactRequest)
@@ -35,6 +46,42 @@ namespace ContactsAPI.Controllers
             dbContext.Contacts.Add(contact);
             dbContext.SaveChanges();
             return Ok(contact);
+        }
+
+        [HttpPut]
+        [Route("{id:guid}")]
+        public IActionResult UpdateContact([FromRoute] Guid id, UpdateContactRequest updateContectRequest)
+        {
+            var contact = dbContext.Contacts.Find(id);
+
+            if (contact != null)
+            {
+                contact.FullName = updateContectRequest.FullName;
+                contact.Address = updateContectRequest.Address;
+                contact.Phone = updateContectRequest.Phone;
+                contact.Email = updateContectRequest.Email;
+
+                dbContext.SaveChanges();
+                return Ok(contact);
+            }
+
+            return NotFound();
+        }
+        
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public IActionResult DeleteContact([FromRoute] Guid id)
+        {
+            var contact = dbContext.Contacts.Find(id);
+
+            if (contact != null)
+            {
+                dbContext.Contacts.Remove(contact);
+                dbContext.SaveChanges();
+                return Ok(contact);
+            }
+
+            return NotFound();
         }
     }
 }
